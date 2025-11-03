@@ -1,41 +1,99 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Botón Reportar</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #5ee3e8; /* Fondo celeste */
-            font-family: Arial, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <title>Emergencia - Enviar ubicación y llamar</title>
+  <style>
+    body {
+      background-color: #b8fbd0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      margin: 0;
+    }
 
-        button {
-            background-color: #036b72; /* Color del botón */
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    h1 {
+      color: #064420;
+      margin-bottom: 40px;
+    }
 
-        button:hover {
-            background-color: #02575d; /* Color más oscuro al pasar el mouse */
-        }
-    </style>
+    button {
+      background-color: #2b9348;
+      color: white;
+      font-size: 22px;
+      border: none;
+      border-radius: 14px;
+      padding: 18px 45px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1a7431;
+    }
+
+    p {
+      margin-top: 25px;
+      color: #064420;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
-   
-    <form action="tel:+573182940284" method="get">
-        <button type="submit">Reportar</button>
-    </form>
+  <h1>🚨 Reportar Emergencia</h1>
+  <button onclick="sendLocation()">Enviar ubicación y llamar</button>
+  <p id="status"></p>
+
+  <script>
+    function sendLocation() {
+      const status = document.getElementById("status");
+      status.innerText = "📡 Obteniendo ubicación, por favor espera...";
+
+      if (!navigator.geolocation) {
+        status.innerText = "❌ Tu navegador no soporta la geolocalización.";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true });
+    }
+
+    function success(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const phone = "573182940284"; // Número sin '+'
+      const now = new Date();
+
+      const hora = now.toLocaleTimeString();
+      const fecha = now.toLocaleDateString();
+
+      // Crear enlace de ubicación en Google Maps
+      const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+      const message =
+        `🚨 *Ubicación de emergencia enviada automáticamente* 🚨%0A` +
+        `📅 Fecha: ${fecha}%0A🕒 Hora: ${hora}%0A` +
+        `📍 ${mapsLink}%0A%0A⚠️ Por favor responder lo antes posible.`;
+
+      // Enviar mensaje por WhatsApp
+      const waUrl = `https://wa.me/${phone}?text=${message}`;
+      window.open(waUrl, "_blank");
+
+      document.getElementById("status").innerText =
+        "✅ Ubicación enviada. Realizando llamada en 4 segundos...";
+
+      // Espera unos segundos y realiza la llamada automáticamente
+      setTimeout(() => {
+        window.location.href = `tel:+${phone}`;
+      }, 4000);
+    }
+
+    function error() {
+      document.getElementById("status").innerText =
+        "⚠️ No se pudo obtener la ubicación. Asegúrate de permitir el acceso al GPS.";
+    }
+  </script>
 </body>
 </html>
-

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Enviar reporte</title>
+  <style>
+    body {
+      background-color: #b8fbd0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    form {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      width: 350px;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #2b9348;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1a7431;
+    }
+  </style>
+</head>
+<body>
+
+<form id="reportForm">
+  <h2>Enviar Reporte</h2>
+
+  <label>Latitud:</label>
+  <input type="text" id="lat" placeholder="Ejemplo: 4.7110" required>
+
+  <label>Longitud:</label>
+  <input type="text" id="lon" placeholder="Ejemplo: -74.0721" required>
+
+  <label>Nota (opcional):</label>
+  <textarea id="note" rows="2" placeholder="Describe el reporte..."></textarea>
+
+  <button type="button" onclick="sendReport()">Enviar Reporte</button>
+</form>
+
+<script>
+function sendReport() {
+  const lat = document.getElementById("lat").value.trim();
+  const lon = document.getElementById("lon").value.trim();
+  const note = document.getElementById("note").value.trim();
+  const phone = "573182940284"; // número sin +
+
+  if (!lat || !lon) {
+    alert("Por favor, ingresa la latitud y longitud.");
+    return;
+  }
+
+  // Crear mensaje para WhatsApp
+  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+  const message = `🚨 *Nuevo reporte ambiental* 🚨%0A- Latitud: ${lat}%0A- Longitud: ${lon}%0A${note ? "📝 " + note + "%0A" : ""}📍 ${mapsLink}`;
+  
+  // Abrir WhatsApp en una nueva pestaña
+  const waUrl = `https://wa.me/${phone}?text=${message}`;
+  window.open(waUrl, "_blank");
+
+  // Esperar 3 segundos y luego iniciar la llamada
+  setTimeout(() => {
+    window.location.href = `tel:+${phone}`;
+  }, 3000);
+}
+</script>
+
+</body>
+</html>
