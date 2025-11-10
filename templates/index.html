@@ -125,5 +125,27 @@
             }
         });
     </script>
+    <script>
+let inactivityTime = 30000;
+let inactivityTimer;
+
+
+function resetTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(showReminder, inactivityTime);
+}
+
+function showReminder() {
+    alert("¿Deseas reportar alguna novedad?");
+}
+
+
+window.onload = resetTimer;
+document.onmousemove = resetTimer;
+document.onkeypress = resetTimer;
+document.ontouchstart = resetTimer;
+document.onclick = resetTimer;
+</script>
+
 </body>
 </html>
