@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Emergencia - Enviar ubicación y llamar</title>
+  <title>Emergencia - Enviar ubicación y contactar</title>
   <style>
     body {
       background-color: #b8fbd0;
@@ -21,8 +21,7 @@
       margin-bottom: 40px;
     }
 
-    button {
-      background-color: #2b9348;
+    .btn {
       color: white;
       font-size: 22px;
       border: none;
@@ -30,10 +29,22 @@
       padding: 18px 45px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      margin: 10px;
+      width: 280px;
     }
 
-    button:hover {
-      background-color: #1a7431;
+    .emergencia {
+      background-color: #d62828;
+    }
+    .emergencia:hover {
+      background-color: #a4161a;
+    }
+
+    .varado {
+      background-color: #0077b6;
+    }
+    .varado:hover {
+      background-color: #023e8a;
     }
 
     p {
@@ -44,17 +55,25 @@
   </style>
 </head>
 <body>
-  <h1> Reportar Emergencia</h1>
-  <button onclick="sendLocation()">CONTACTANOS</button>
+  <h1>Centro de Atención de Emergencias</h1>
+
+  <button class="btn emergencia" onclick="reportEmergency()">🚨 REPORTAR EMERGENCIA</button>
+  <button class="btn varado" onclick="goToDiscord()">🆘 ESTOY VARADO</button>
+
   <p id="status"></p>
 
   <script>
-    function sendLocation() {
+    const discordInvite = "https://discord.gg/rCCasyGy";
+    let inactivityTime = 30000; // 30 segundos sin interacción
+    let timeout;
+
+    // 🟢 FUNCION: Botón de emergencia
+    function reportEmergency() {
       const status = document.getElementById("status");
-      status.innerText = " Obteniendo ubicación... por favor espera...";
+      status.innerText = "Obteniendo ubicación... por favor espera...";
 
       if (!navigator.geolocation) {
-        status.innerText = "  navegador ERROR.";
+        status.innerText = "Error: el navegador no soporta geolocalización.";
         return;
       }
 
@@ -64,26 +83,23 @@
     function success(position) {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
-      const phone = "573182940284"; 
-
+      const phone = "573182940284";
+      const now = new Date();
       const hora = now.toLocaleTimeString();
       const fecha = now.toLocaleDateString();
 
-      
       const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
       const message =
-        ` *Ubicación de emergencia enviada automáticamente* 🚨%0A` +
-        `📅Fecha: ${fecha}%0A🕒 Hora: ${hora}%0A` +
-        ` ${mapsLink}%0A%0A  Por favor responder lo antes posible.`;
+        `*🚨 Emergencia Reportada*%0A` +
+        `📅 Fecha: ${fecha}%0A🕒 Hora: ${hora}%0A` +
+        `${mapsLink}%0A%0A Por favor responder lo antes posible.`;
 
-      
       const waUrl = `https://wa.me/${phone}?text=${message}`;
       window.open(waUrl, "_blank");
 
       document.getElementById("status").innerText =
         "✅ Ubicación enviada. Realizando llamada en 4 segundos...";
 
-      // Espera unos segundos y realiza la llamada automáticamente
       setTimeout(() => {
         window.location.href = `tel:+${phone}`;
       }, 4000);
@@ -91,8 +107,29 @@
 
     function error() {
       document.getElementById("status").innerText =
-        " No se pudo obtener la ubicación. Asegúrate de permitir el acceso al GPS.";
+        "No se pudo obtener la ubicación. Asegúrate de permitir el acceso al GPS.";
     }
+
+    // 🟦 FUNCION: Botón de 'Estoy Varado'
+    function goToDiscord() {
+      window.open(discordInvite, "_blank");
+    }
+
+    // 🟡 Detección de inactividad
+    function resetTimer() {
+      clearTimeout(timeout);
+      timeout = setTimeout(sendInactivityAlert, inactivityTime);
+    }
+
+    function sendInactivityAlert() {
+      alert("¿Deseas reportar alguna novedad?");
+      fetch("/alerta", { method: "POST" });
+    }
+
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onclick = resetTimer;
   </script>
 </body>
 </html>
