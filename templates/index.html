@@ -100,14 +100,16 @@
             }
         });
 
-        // 🆘 Botón de varado: enviar ubicación a Discord
+     
         document.getElementById("btnVarado").addEventListener("click", () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     const lat = pos.coords.latitude;
                     const lon = pos.coords.longitude;
                     const data = {
-                        content: `🆘 **Usuario !varado**\n📍 Ubicación: https://www.google.com/maps?q=${lat},${lon}`
+                    content: `🆘 **Usuario varado **\n📍 Ubicación: https://www.google.com/maps?q=${lat},${lon}\n !varado`
+                        
+                         
                     };
 
                     fetch(webhookUrl, {
