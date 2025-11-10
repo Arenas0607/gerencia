@@ -1,135 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Emergencia - Enviar ubicación y contactar</title>
-  <style>
-    body {
-      background-color: #b8fbd0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-      margin: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Atención de Emergencias</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #87CEEB; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-    h1 {
-      color: #064420;
-      margin-bottom: 40px;
-    }
+        .card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
+            width: 320px;
+        }
 
-    .btn {
-      color: white;
-      font-size: 22px;
-      border: none;
-      border-radius: 14px;
-      padding: 18px 45px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin: 10px;
-      width: 280px;
-    }
+        h1 {
+            color: #003366;
+            font-size: 22px;
+            margin-bottom: 30px;
+            line-height: 1.3em;
+        }
 
-    .emergencia {
-      background-color: #d62828;
-    }
-    .emergencia:hover {
-      background-color: #a4161a;
-    }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            margin: 12px 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
 
-    .varado {
-      background-color: #0077b6;
-    }
-    .varado:hover {
-      background-color: #023e8a;
-    }
+        .btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+        }
 
-    p {
-      margin-top: 25px;
-      color: #064420;
-      font-size: 18px;
-    }
-  </style>
+        .btn-emergencia {
+            background-color: #e63946;
+        }
+
+        .btn-varado {
+            background-color: #0077b6;
+        }
+
+        footer {
+            font-size: 13px;
+            color: gray;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Centro de Atención de Emergencias</h1>
 
-  <button class="btn emergencia" onclick="reportEmergency()">🚨 REPORTAR EMERGENCIA</button>
-  <button class="btn varado" onclick="goToDiscord()">🆘 ESTOY VARADO</button>
+    <div class="card">
+        <h1>Centro de Atención<br>de Emergencias</h1>
+        <button id="btnEmergencia" class="btn btn-emergencia">🚨 REPORTAR EMERGENCIA</button>
+        <button id="btnVarado" class="btn btn-varado">🆘 ESTOY VARADO</button>
+        <footer>Servicio 24/7 – Atención inmediata<br><br>© Cristian Arenas - Andrés Galindo</footer>
+    </div>
 
-  <p id="status"></p>
+    <script>
+        const webhookUrl = "https://discord.com/api/webhooks/1437289372054720594/2N-AMKnjk2bvP01TV0dD-d5H0OaLXxIWkTQk_mfDvT0KA5gxgHpVnSOWwVTYOgiRuWdX";
+        const discordChannelUrl = "https://discord.com/channels/1437281369699909773/1437281370270601391";
+        const whatsappPhone = "573182940284"; // WhatsApp (Línea 79)
+        const emergencyNumber = "123"; 
 
-  <script>
-    const discordInvite = "https://discord.gg/rCCasyGy";
-    let inactivityTime = 30000; // 30 segundos sin interacción
-    let timeout;
+        document.getElementById("btnEmergencia").addEventListener("click", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    const message = `🚨 *Emergencia Reportada*\n📍 Ubicación: https://www.google.com/maps?q=${lat},${lon}`;
 
-    // 🟢 FUNCION: Botón de emergencia
-    function reportEmergency() {
-      const status = document.getElementById("status");
-      status.innerText = "Obteniendo ubicación... por favor espera...";
+                    // 1️⃣ Enviar ubicación por WhatsApp
+                    window.open(`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(message)}`);
 
-      if (!navigator.geolocation) {
-        status.innerText = "Error: el navegador no soporta geolocalización.";
-        return;
-      }
+                    // 2️⃣ Llamar al 123 después de 3 segundos
+                    setTimeout(() => {
+                        window.location.href = `tel:${emergencyNumber}`;
+                    }, 3000);
+                });
+            } else {
+                alert("No se pudo obtener la ubicación.");
+            }
+        });
 
-      navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true });
-    }
+        // 🆘 Botón de varado: enviar ubicación a Discord
+        document.getElementById("btnVarado").addEventListener("click", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    const data = {
+                        content: `🆘 **Usuario !varado**\n📍 Ubicación: https://www.google.com/maps?q=${lat},${lon}`
+                    };
 
-    function success(position) {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      const phone = "573182940284";
-      const now = new Date();
-      const hora = now.toLocaleTimeString();
-      const fecha = now.toLocaleDateString();
+                    fetch(webhookUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    });
 
-      const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
-      const message =
-        `*🚨 Emergencia Reportada*%0A` +
-        `📅 Fecha: ${fecha}%0A🕒 Hora: ${hora}%0A` +
-        `${mapsLink}%0A%0A Por favor responder lo antes posible.`;
-
-      const waUrl = `https://wa.me/${phone}?text=${message}`;
-      window.open(waUrl, "_blank");
-
-      document.getElementById("status").innerText =
-        "✅ Ubicación enviada. Realizando llamada en 4 segundos...";
-
-      setTimeout(() => {
-        window.location.href = `tel:+${phone}`;
-      }, 4000);
-    }
-
-    function error() {
-      document.getElementById("status").innerText =
-        "No se pudo obtener la ubicación. Asegúrate de permitir el acceso al GPS.";
-    }
-
-    // 🟦 FUNCION: Botón de 'Estoy Varado'
-    function goToDiscord() {
-      window.open(discordInvite, "_blank");
-    }
-
-    // 🟡 Detección de inactividad
-    function resetTimer() {
-      clearTimeout(timeout);
-      timeout = setTimeout(sendInactivityAlert, inactivityTime);
-    }
-
-    function sendInactivityAlert() {
-      alert("¿Deseas reportar alguna novedad?");
-      fetch("/alerta", { method: "POST" });
-    }
-
-    window.onload = resetTimer;
-    document.onmousemove = resetTimer;
-    document.onkeypress = resetTimer;
-    document.onclick = resetTimer;
-  </script>
+                    window.open(discordChannelUrl, "_blank");
+                });
+            } else {
+                alert("No se pudo obtener la ubicación.");
+            }
+        });
+    </script>
 </body>
 </html>
