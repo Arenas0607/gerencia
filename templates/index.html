@@ -44,17 +44,17 @@
   </style>
 </head>
 <body>
-  <h1>🚨 Reportar Emergencia</h1>
-  <button onclick="sendLocation()">Enviar ubicación y llamar</button>
+  <h1> Reportar Emergencia</h1>
+  <button onclick="sendLocation()">CONTACTANOS</button>
   <p id="status"></p>
 
   <script>
     function sendLocation() {
       const status = document.getElementById("status");
-      status.innerText = "📡 Obteniendo ubicación, por favor espera...";
+      status.innerText = " Obteniendo ubicación... por favor espera...";
 
       if (!navigator.geolocation) {
-        status.innerText = "❌ Tu navegador no soporta la geolocalización.";
+        status.innerText = "  navegador ERROR.";
         return;
       }
 
@@ -64,20 +64,19 @@
     function success(position) {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
-      const phone = "573182940284"; // Número sin '+'
-      const now = new Date();
+      const phone = "573182940284"; 
 
       const hora = now.toLocaleTimeString();
       const fecha = now.toLocaleDateString();
 
-      // Crear enlace de ubicación en Google Maps
+      
       const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
       const message =
-        `🚨 *Ubicación de emergencia enviada automáticamente* 🚨%0A` +
-        `📅 Fecha: ${fecha}%0A🕒 Hora: ${hora}%0A` +
-        `📍 ${mapsLink}%0A%0A⚠️ Por favor responder lo antes posible.`;
+        ` *Ubicación de emergencia enviada automáticamente* 🚨%0A` +
+        `📅Fecha: ${fecha}%0A🕒 Hora: ${hora}%0A` +
+        ` ${mapsLink}%0A%0A  Por favor responder lo antes posible.`;
 
-      // Enviar mensaje por WhatsApp
+      
       const waUrl = `https://wa.me/${phone}?text=${message}`;
       window.open(waUrl, "_blank");
 
@@ -92,7 +91,7 @@
 
     function error() {
       document.getElementById("status").innerText =
-        "⚠️ No se pudo obtener la ubicación. Asegúrate de permitir el acceso al GPS.";
+        " No se pudo obtener la ubicación. Asegúrate de permitir el acceso al GPS.";
     }
   </script>
 </body>
